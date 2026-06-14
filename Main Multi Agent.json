@@ -1,0 +1,369 @@
+{
+  "name": "Main Multi Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -176,
+        -80
+      ],
+      "id": "e258556c-ea22-43c6-8efb-1c47252b9a75",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "wBPHQA6BfPIgp6nz",
+          "name": "Gmail Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1154a029-853e-4199-a08e-962c384e6d65",
+              "name": "text",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "21d5db9c-c896-4e7b-abd9-13fdf9c82966",
+              "name": "threadId",
+              "value": "={{ $json.threadId }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        -96
+      ],
+      "id": "07ccbce2-1135-4b3a-9232-b1b0ab6e988e",
+      "name": "Normalizacao"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        528,
+        48
+      ],
+      "id": "a6b41756-69ee-45f3-8cfc-05e8dab5e077",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "E1ob9BFj5Glj9auJ",
+          "name": "Google Gemini"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json.text }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "Comercial",
+              "description": "Mensagens com dúvidas sobre planos, preços, formas de pagamento, contratação do serviço, funcionalidades do produto ou benefícios oferecidos.  \n\nPalavras-chave: preço, plano, pagamento, contratação, benefício, funcionalidade, venda, comercial, produto"
+            },
+            {
+              "category": "Tecnico",
+              "description": "Mensagens que envolvem dificuldades técnicas, como erros na ferramenta, mau funcionamento, problemas no uso, solicitações de suporte operacional. \n\nPalavras-chave: erro, problema, suporte, falha, bug, uso, curso, técnico, ajuda"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        -96
+      ],
+      "id": "e7ca92c9-cfdb-4e95-88b2-14068d3b5d10",
+      "name": "Classificador de email"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "bXPjabXe60c471Cs",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/bXPjabXe60c471Cs",
+          "cachedResultName": "Hash computadores comercial"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "text": "={{ $('Normalizacao').item.json.text }}",
+            "threadId": "={{ $('Normalizacao').item.json.threadId }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "text",
+              "displayName": "text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "threadId",
+              "displayName": "threadId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        816,
+        -240
+      ],
+      "id": "f00d8350-e47b-4939-a55e-5748854e5912",
+      "name": "Agente comercial"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "yXUAVOU9nayqBKf9",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/yXUAVOU9nayqBKf9",
+          "cachedResultName": "Hash computadores tecnico"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "text": "={{ $('Normalizacao').item.json.text }}",
+            "threadId": "={{ $('Normalizacao').item.json.threadId }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "text",
+              "displayName": "text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "threadId",
+              "displayName": "threadId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        816,
+        32
+      ],
+      "id": "8e25bfc8-ef94-47cf-b3c3-3ef1e4a30800",
+      "name": "Agente tecnico"
+    },
+    {
+      "parameters": {
+        "resource": "thread",
+        "operation": "reply",
+        "threadId": "={{ $('Gmail Trigger').item.json.threadId }}",
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}",
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1072,
+        -112
+      ],
+      "id": "2b952162-a8fe-4676-adae-62959ba51c1d",
+      "name": "Respondendo mensagem",
+      "webhookId": "d58184bd-2e87-4baf-9de0-dbc518c01511",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "wBPHQA6BfPIgp6nz",
+          "name": "Gmail Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "07733287-0d6e-41d0-a313-c2a4906ecb0b",
+              "leftValue": "={{ $json.from.value[0].address }}",
+              "rightValue": "rodolfo.c.silva@outlook.com",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        32,
+        -80
+      ],
+      "id": "c37f9267-af41-4b6c-93ed-17e49f3b1361",
+      "name": "If"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalizacao": {
+      "main": [
+        [
+          {
+            "node": "Classificador de email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Classificador de email",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classificador de email": {
+      "main": [
+        [
+          {
+            "node": "Agente comercial",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Agente tecnico",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente comercial": {
+      "main": [
+        [
+          {
+            "node": "Respondendo mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente tecnico": {
+      "main": [
+        [
+          {
+            "node": "Respondendo mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Normalizacao",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "5417f1ee-c61d-46d6-b9de-ad9a031b48ba",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6cadb97ef3a589c83dd48b5cc09f99b6887897385bf0dfa86ae2dea9e1049d65"
+  },
+  "id": "k5ALuui8T4w44Rtg",
+  "tags": []
+}
